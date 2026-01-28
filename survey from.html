@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive Survey</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-2: #3b82f6;
+      --danger: #ef4444;
+      --border: #1f2937;
+      --input: #0b1220;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 10% 10%, #0b1220 0%, var(--bg) 40%, #0a0f1f 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), #0d1324);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .card header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge {
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 8px;
+    }
+
+    .card h1, .card h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: 0.2px;
+    }
+
+    .content {
+      padding: 1.25rem;
+    }
+
+    form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea { min-height: 110px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #0c1426;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip input { accent-color: var(--accent-2); }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0c2619;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.02s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:hover { background: #4a7956; }
+    button:active { transform: translateY(1px); }
+
+    .primary {
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      border: none;
+      color: rgb(255, 255, 255);
+    }
+
+    .danger {
+      background: #1a0f12;
+      border-color: #3b1a22;
+      color: #fecaca;
+    }
+
+    .success {
+      background: #141a0f;
+      border-color: #555d6b;
+      color: #f7bbf4;
+    }
+
+    .status {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .list {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .item {
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #200c26;
+    }
+
+    .item h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+    }
+
+    .item pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+      color: #e1dccb;
+    }
+
+    .empty {
+      padding: 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Survey card -->
+    <section class="card">
+      <header>
+        <span class="badge">Survey</span>
+        <h1>Product feedback</h1>
+      </header>
+      <div class="content">
+        <form id="surveyForm" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" placeholder="Your name" required />
+            <span class="hint">Required</span>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@example.com" required />
+              <span class="hint">We’ll never share your email</span>
+            </div>
+            <div class="field">
+              <label for="role">Role</label>
+              <select id="role" name="role" required>
+                <option value="">Select your role</option>
+                <option>Student</option>
+                <option>Developer</option>
+                <option>Designer</option>
+                <option>Manager</option>
+                <option>Other</option>
+              </select>
+              <span class="hint">Required</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Features you use most</label>
+            <div class="options">
+              <label class="chip"><input type="checkbox" name="features" value="Dashboard" /> Dashboard</label>
+              <label class="chip"><input type="checkbox" name="features" value="Reports" /> Reports</label>
+              <label class="chip"><input type="checkbox" name="features" value="Notifications" /> Notifications</label>
+              <label class="chip"><input type="checkbox" name="features" value="Integrations" /> Integrations</label>
+              <label class="chip"><input type="checkbox" name="features" value="Mobile app" /> Mobile app</label>
+            </div>
+            <span class="hint">Pick any that apply</span>
+          </div>
+
+          <div class="field">
+            <label>Overall satisfaction</label>
+            <div class="options">
+              <label class="chip"><input type="radio" name="satisfaction" value="1" required /> 1</label>
+              <label class="chip"><input type="radio" name="satisfaction" value="2" /> 2</label>
+              <label class="chip"><input type="radio" name="satisfaction" value="3" /> 3</label>
+              <label class="chip"><input type="radio" name="satisfaction" value="4" /> 4</label>
+              <label class="chip"><input type="radio" name="satisfaction" value="5" /> 5</label>
+            </div>
+            <span class="hint">1 = poor, 5 = excellent</span>
+          </div>
+
+          <div class="field">
+            <label for="feedback">What should we improve?</label>
+            <textarea id="feedback" name="feedback" placeholder="Your thoughts..." required></textarea>
+            <span class="hint">Be as specific as you like</span>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary">Submit</button>
+            <button type="button" id="resetBtn">Reset form</button>
+          </div>
+          <div id="formStatus" class="status"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Data card -->
+    <section class="card">
+      <header>
+        <span class="badge">Data</span>
+        <h2>Local responses</h2>
+      </header>
+      <div class="content">
+        <div class="actions">
+          <button type="button" id="viewBtn" class="success">View saved data</button>
+          <button type="button" id="exportBtn">Export JSON</button>
+          <button type="button" id="clearBtn" class="danger">Clear data</button>
+        </div>
+        <div id="list" class="list" style="margin-top: 1rem;"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Storage key
+    const STORAGE_KEY = "survey_responses_v1";
+
+    // Helpers
+    const getData = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const setData = (arr) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    };
+
+    const addEntry = (entry) => {
+      const data = getData();
+      data.push(entry);
+      setData(data);
+    };
+
+    const downloadJSON = (filename, dataObj) => {
+      const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    // Form handling
+    const form = document.getElementById("surveyForm");
+    const statusEl = document.getElementById("formStatus");
+    const resetBtn = document.getElementById("resetBtn");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Basic validation
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const role = form.role.value;
+      const satisfaction = form.satisfaction.value;
+      const feedback = form.feedback.value.trim();
+
+      if (!name || !email || !role || !satisfaction || !feedback) {
+        statusEl.textContent = "Please complete all required fields.";
+        statusEl.style.color = "#fca5a5";
+        return;
+      }
+
+      // Collect features
+      const features = Array.from(form.querySelectorAll('input[name="features"]:checked'))
+        .map((el) => el.value);
+
+      // Entry object
+      const entry = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        name,
+        email,
+        role,
+        features,
+        satisfaction: Number(satisfaction),
+        feedback
+      };
+
+      addEntry(entry);
+      statusEl.textContent = "Saved locally. Thank you!";
+      statusEl.style.color = "#bbf7d0";
+      form.reset();
+      renderList(); // refresh list
+    });
+
+    resetBtn.addEventListener("click", () => {
+      form.reset();
+      statusEl.textContent = "Form cleared.";
+      statusEl.style.color = "#9ca3af";
+    });
+
+    // Data actions
+    const listEl = document.getElementById("list");
+    const viewBtn = document.getElementById("viewBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const renderList = () => {
+      const data = getData();
+      listEl.innerHTML = "";
+
+      if (!data.length) {
+        listEl.innerHTML = '<div class="empty">No responses saved yet.</div>';
+        return;
+      }
+
+      data
+        .slice()
+        .reverse()
+        .forEach((item, idx) => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <h4>#${data.length - idx} • ${new Date(item.timestamp).toLocaleString()}</h4>
+            <pre>${JSON.stringify(item, null, 2)}</pre>
+          `;
+          listEl.appendChild(div);
+        });
+    };
+
+    viewBtn.addEventListener("click", renderList);
+
+    exportBtn.addEventListener("click", () => {
+      const data = getData();
+      if (!data.length) {
+        alert("No data to export.");
+        return;
+      }
+      downloadJSON("survey_responses.json", data);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      const ok = confirm("Clear all saved responses?");
+      if (!ok) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderList();
+    });
+
+    // Initial render
+    renderList();
+  </script>
+</body>
+</html>
